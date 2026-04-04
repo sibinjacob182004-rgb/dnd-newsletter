@@ -1,27 +1,28 @@
 import os
 import time
-from resend import Resend
+import resend
 
 from backend.utils.supabase_client import get_supabase_client
 from backend.utils.logger import logger
 
-# Load env variables
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 FROM_EMAIL = os.getenv("FROM_EMAIL")
 
-resend = Resend(api_key=RESEND_API_KEY)
+resend.api_key = RESEND_API_KEY
 
 
 def get_all_subscribers():
     supabase = get_supabase_client()
 
-    response = supabase.table("subscribers").select("email").eq("subscribed", True).execute()
+    response = supabase.table("subscribers") \
+        .select("email") \
+        .eq("subscribed", True) \
+        .execute()
 
-    emails = [row["email"] for row in response.data]
-    return emails
+    return [row["email"] for row in response.data]
 
 
-def send_bulk_emails(subject, html):
+def send_bulk_emails(subject, html_template):
     subscribers = get_all_subscribers()
 
     success = 0
@@ -29,9 +30,13 @@ def send_bulk_emails(subject, html):
 
     for email in subscribers:
         try:
+            unsubscribe_link = f"https://dnd-newsletter.onrender.com/unsubscribe?email={email}"
+
+            html = html_template.replace("{unsubscribe_link}", unsubscribe_link)
+
             logger.info(f"📤 Sending to: {email}")
 
-            resend.emails.send({
+            resend.Emails.send({
                 "from": FROM_EMAIL,
                 "to": email,
                 "subject": subject,
@@ -41,7 +46,6 @@ def send_bulk_emails(subject, html):
             logger.info(f"✅ Sent to {email}")
             success += 1
 
-            # Rate limiting (avoid spam issues)
             time.sleep(1)
 
         except Exception as e:

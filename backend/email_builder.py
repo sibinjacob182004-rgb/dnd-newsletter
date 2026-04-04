@@ -1,44 +1,39 @@
 from datetime import datetime
-from pathlib import Path
-
-TEMPLATE_PATH = Path(__file__).parent / "templates" / "email_template.html"
 
 
-def generate_article_block(article: dict) -> str:
-    title = article.get("title", "No Title")
-    summary = article.get("summary", "")[:200] + "..."
-    url = article.get("url", "#")
-    source = article.get("source", "Unknown")
+def build_subject():
+    today = datetime.now().strftime("%B %d, %Y")
+    return f"🧠 Data n Dreads | Top AI & Data Science News - {today}"
 
-    return f"""
-    <div class="article">
-        <div class="article-title">{title}</div>
-        <div class="article-summary">{summary}</div>
-        <p><strong>Source:</strong> {source}</p>
-        <a href="{url}" class="read-more" target="_blank">
-            Read More
-        </a>
-    </div>
+
+def build_email_html(articles, unsubscribe_base_url):
+    html = f"""
+    <html>
+    <body style="font-family: Arial; background-color: #f4f4f4; padding: 20px;">
+        <h2>🧠 Data n Dreads | DataForge Newsletter</h2>
+        <p>Latest in AI, ML & Data Science:</p>
     """
 
+    for article in articles[:10]:
+        html += f"""
+        <div style="background: white; padding: 10px; margin-bottom: 10px; border-radius: 8px;">
+            <h3>{article['title']}</h3>
+            <p>{article['summary']}</p>
+            <p><b>Source:</b> {article['source']}</p>
+            <a href="{article['url']}">Read more</a>
+        </div>
+        """
 
-def build_email_html(articles: list, unsubscribe_link: str) -> str:
-    if not articles:
-        return "<p>No articles available today.</p>"
-
-    article_blocks = "".join(
-        generate_article_block(article) for article in articles
-    )
-
-    with open(TEMPLATE_PATH, "r", encoding="utf-8") as f:
-        template = f.read()
-
-    html = template.replace("{{articles}}", article_blocks)
-    html = html.replace("{{unsubscribe_link}}", unsubscribe_link)
+    html += """
+        <hr>
+        <p style="font-size: 12px; color: gray;">
+            If you wish to unsubscribe, click below:
+        </p>
+        <p>
+            <a href="{unsubscribe_link}">Unsubscribe</a>
+        </p>
+    </body>
+    </html>
+    """
 
     return html
-
-
-def build_subject() -> str:
-    today = datetime.now().strftime("%b %d, %Y")
-    return f"🧠 AI & Data Science Digest — {today}"

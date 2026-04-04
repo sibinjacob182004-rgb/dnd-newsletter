@@ -8,7 +8,6 @@ def run_pipeline():
     logger.info("🚀 Starting newsletter pipeline...")
 
     try:
-        # 1. Fetch articles
         articles = fetch_all_news()
         logger.info(f"📰 Articles fetched: {len(articles)}")
 
@@ -16,14 +15,13 @@ def run_pipeline():
             logger.warning("⚠️ No articles found. Skipping email.")
             return
 
-        # 2. Build email
         html = build_email_html(
             articles,
-            "http://localhost:8000/unsubscribe"
+            "https://dnd-newsletter.onrender.com/unsubscribe"
         )
+
         subject = build_subject()
 
-        # 3. Send emails
         send_bulk_emails(subject, html)
 
         logger.info("✅ Pipeline completed successfully")
