@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+requests
+feedparser
+python-dotenv
+supabase
+resend
+apscheduler
+pytz
+pydantic
