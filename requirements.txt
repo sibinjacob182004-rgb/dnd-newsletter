@@ -8,3 +8,4 @@ resend
 apscheduler
 pytz
 pydantic
+email-validator
