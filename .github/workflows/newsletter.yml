@@ -11,26 +11,30 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4        # ✅ upgraded
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5   # ✅ upgraded
         with:
           python-version: "3.11"
 
       - name: Install dependencies
         run: pip install -r backend/requirements.txt
 
-      # 🔍 DEBUG STEP (VERY IMPORTANT)
+      # 🔍 DEBUG STEP — safe, only checks presence not values
       - name: Debug env
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
         run: |
-          echo "SUPABASE_URL=$SUPABASE_URL"
-          echo "SUPABASE_KEY=$SUPABASE_KEY"
-          echo "GNEWS_API_KEY=$GNEWS_API_KEY"
+          echo "SUPABASE_URL present: $([[ -n $SUPABASE_URL ]] && echo yes || echo NO)"
+          echo "SUPABASE_KEY present: $([[ -n $SUPABASE_KEY ]] && echo yes || echo NO)"
+          echo "GNEWS_API_KEY present: $([[ -n $GNEWS_API_KEY ]] && echo yes || echo NO)"
+          echo "RESEND_API_KEY present: $([[ -n $RESEND_API_KEY ]] && echo yes || echo NO)"
+          echo "FROM_EMAIL present: $([[ -n $FROM_EMAIL ]] && echo yes || echo NO)"
 
       # 🚀 RUN YOUR PIPELINE
       - name: Run pipeline

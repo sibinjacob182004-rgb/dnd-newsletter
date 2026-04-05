@@ -1,17 +1,22 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 from supabase import create_client, Client
 
-# Load .env explicitly
-env_path = Path(__file__).resolve().parents[2] / ".env"
-load_dotenv(dotenv_path=env_path)
+# Load .env only in local development (file won't exist in GitHub Actions)
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).resolve().parents[2] / ".env"
+    if env_path.exists():
+        load_dotenv(dotenv_path=env_path)
+except ImportError:
+    pass
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "").strip()
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "").strip()
 
-print("DEBUG URL:", SUPABASE_URL)
-print("DEBUG KEY:", SUPABASE_KEY)
+# Safe debug — shows presence only, never leaks values
+print(f"DEBUG URL present: {bool(SUPABASE_URL)}")
+print(f"DEBUG KEY present: {bool(SUPABASE_KEY)}")
 
 
 def get_supabase_client() -> Client:
