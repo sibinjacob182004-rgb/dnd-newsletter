@@ -1,0 +1,31 @@
+name: Daily Newsletter
+
+on:
+  schedule:
+    - cron: "30 2 * * *"  # 8 AM IST
+  workflow_dispatch:
+
+jobs:
+  run-newsletter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
+        run: python -m backend.orchestrator
