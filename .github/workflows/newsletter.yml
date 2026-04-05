@@ -3,7 +3,7 @@ name: Daily Newsletter
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 2 * * *"
+    - cron: "30 2 * * *"   # 8:00 AM IST
 
 jobs:
   run-newsletter:
@@ -21,6 +21,18 @@ jobs:
       - name: Install dependencies
         run: pip install -r backend/requirements.txt
 
+      # 🔍 DEBUG STEP (VERY IMPORTANT)
+      - name: Debug env
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GNEWS_API_KEY: ${{ secrets.GNEWS_API_KEY }}
+        run: |
+          echo "SUPABASE_URL=$SUPABASE_URL"
+          echo "SUPABASE_KEY=$SUPABASE_KEY"
+          echo "GNEWS_API_KEY=$GNEWS_API_KEY"
+
+      # 🚀 RUN YOUR PIPELINE
       - name: Run pipeline
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
