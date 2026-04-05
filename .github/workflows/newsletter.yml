@@ -11,17 +11,16 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4        # ✅ upgraded
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5   # ✅ upgraded
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r backend/requirements.txt
+        run: pip install -r requirements.txt        # fixed: was backend/requirements.txt
 
-      # 🔍 DEBUG STEP — safe, only checks presence not values
       - name: Debug env
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -36,7 +35,6 @@ jobs:
           echo "RESEND_API_KEY present: $([[ -n $RESEND_API_KEY ]] && echo yes || echo NO)"
           echo "FROM_EMAIL present: $([[ -n $FROM_EMAIL ]] && echo yes || echo NO)"
 
-      # 🚀 RUN YOUR PIPELINE
       - name: Run pipeline
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
